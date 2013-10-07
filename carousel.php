@@ -15,9 +15,45 @@ class Carousel {
 
 	public function __construct() {
 		add_action( 'init', array( &$this, 'set_options' ) );
+		add_action( 'init', array( &$this, 'do_image_register' ) );
 
 		add_action( 'wp_enqueue_scripts', array( &$this, 'do_style' ) );
 		add_action( 'wp_enqueue_scripts', array( &$this, 'do_script' ) );
+
+	}
+	public function do_image_register() {
+
+		$labels = array(
+			'name'               => 'Carousel Images',
+			'singular_name'      => 'Carousel Image',
+			'add_new'            => 'Add New',
+			'add_new_item'       => 'Add New Image',
+			'edit_item'          => 'Edit Image',
+			'new_item'           => 'New Image',
+			'all_items'          => 'All Images',
+			'view_item'          => 'View Images',
+			'search_items'       => 'Search Images',
+			'not_found'          => 'No images found',
+			'not_found_in_trash' => 'No images found in Trash',
+			'menu_name'          => 'Carousel Images',
+		);
+
+		$args = array(
+			'labels'             => $labels,
+			'show_ui'            => true,
+			'show_in_menu'       => true,
+			'query_var'          => true,
+			'rewrite'            => array( 'slug' => self::$PREFIX ),
+			'has_archive'        => false,
+			'hierarchical'       => false,
+			'menu_position'      => 60,
+			'supports'           => array(
+				'title',
+				'thumbnail',
+			),
+		);
+
+		register_post_type( self::$PREFIX, $args );
 
 	}
 	public function set_options() {
