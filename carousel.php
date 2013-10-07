@@ -20,6 +20,8 @@ class Carousel {
 		add_action( 'wp_enqueue_scripts', array( &$this, 'do_style' ) );
 		add_action( 'wp_enqueue_scripts', array( &$this, 'do_script' ) );
 
+		add_shortcode( 'carousel', array( &$this, 'do_carousel' ) );
+
 	}
 	public function do_image_register() {
 
@@ -54,12 +56,12 @@ class Carousel {
 		);
 
 		register_post_type( self::$PREFIX, $args );
-
 	}
 	public function set_options() {
 		$defaults = array(
 			'width'       => 749,
 			'height'      => 310,
+			'max'         => 10,
 		);
 		$this->options = get_option( self::$PREFIX, $defaults );
 	}
@@ -77,6 +79,53 @@ class Carousel {
 			false,
 			true
 		);
+	}
+	public function do_carousel( $atts ) {
+		extract(
+			shortcode_atts(
+				array(
+					'width'  => $this->options['width'],
+					'height' => $this->options['height'],
+					'max'    => $this->options['max'],
+				), $atts
+			)
+		);
+
+		$images = $this->get_images( $width, $height, $max );
+
+		$carousel = "\n" . '<div id="carousel" />' . "\n";
+
+		foreach ( $images as $image ) {
+			$carousel .= "\n";
+			$carousel .= $image;
+		}
+
+		$carousel .= "\n" . '</div>' . "\n";
+
+		return $carousel;
+	}
+	public function get_images( $width, $height, $max ) {
+
+		$post_images = get_posts(
+			array(
+				'posts_per_page' => $max,
+				'post_type'      => 'carousel',
+			)
+		);
+
+		$images = array();
+		foreach ( $post_images as $image_id => $image ) {
+			$image_id  = get_post_thumbnail_id( $image->ID );
+			$image_url = wp_get_attachment_image_src( $image_id, 'full' );
+
+			$image_html  = " <img src='{$image_url[0]}' ";
+			$image_html .= " width='{$width}' height='{$height}' ";
+			$image_html .= ' /> ';
+
+			$images[] = $image_html;
+		}
+
+		return $images;
 	}
 }
 $carousel = new Carousel();
