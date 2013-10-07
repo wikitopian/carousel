@@ -93,7 +93,9 @@ class Carousel {
 
 		$images = $this->get_images( $width, $height, $max );
 
-		$carousel = "\n" . '<div id="carousel" />' . "\n";
+		$carousel  = "\n" . '<div id="carousel" ';
+		$carousel .= "style='width: {$width}px; height: {$height}px; ";
+		$carousle .= ' />' . "\n";
 
 		foreach ( $images as $image ) {
 			$carousel .= "\n";
