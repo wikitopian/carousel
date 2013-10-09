@@ -19,9 +19,19 @@ class Carousel {
 
 		add_action( 'wp_enqueue_scripts', array( &$this, 'do_style' ) );
 		add_action( 'wp_enqueue_scripts', array( &$this, 'do_script' ) );
+		add_action( 'wp_enqueue_scripts', array( &$this, 'do_js_vars' ) );
 
 		add_shortcode( 'carousel', array( &$this, 'do_carousel' ) );
 
+	}
+	public function set_options() {
+		$defaults = array(
+			'width'       => 749,
+			'height'      => 310,
+			'max'         => 10,
+			'interval'    => 2500,
+		);
+		$this->options = get_option( self::$PREFIX, $defaults );
 	}
 	public function do_image_register() {
 
@@ -57,14 +67,6 @@ class Carousel {
 
 		register_post_type( self::$PREFIX, $args );
 	}
-	public function set_options() {
-		$defaults = array(
-			'width'       => 749,
-			'height'      => 310,
-			'max'         => 10,
-		);
-		$this->options = get_option( self::$PREFIX, $defaults );
-	}
 	public static function do_style() {
 		wp_enqueue_style(
 			self::$PREFIX,
@@ -78,6 +80,17 @@ class Carousel {
 			'jquery',
 			false,
 			true
+		);
+	}
+	public function do_js_vars() {
+		$js_vars = array(
+			'interval' => $this->options['interval'],
+		);
+
+		wp_localize_script(
+			self::$PREFIX,
+			self::$PREFIX,
+			$js_vars
 		);
 	}
 	public function do_carousel( $atts ) {
@@ -94,8 +107,8 @@ class Carousel {
 		$images = $this->get_images( $width, $height, $max );
 
 		$carousel  = "\n" . '<div id="carousel" ';
-		$carousel .= "style='width: {$width}px; height: {$height}px; ";
-		$carousle .= ' />' . "\n";
+		$carousel .= "style='width: {$width}px; height: {$height}px; '";
+		$carousel .= '>' . "\n";
 
 		foreach ( $images as $image ) {
 			$carousel .= "\n";
@@ -122,6 +135,8 @@ class Carousel {
 
 			$image_html  = " <img src='{$image_url[0]}' ";
 			$image_html .= " width='{$width}' height='{$height}' ";
+			$image_html .= "style='width: {$width}px !important; ";
+			$image_html .= "height: {$height}px !important;' ";
 			$image_html .= ' /> ';
 
 			$images[] = $image_html;

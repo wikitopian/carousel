@@ -1,5 +1,5 @@
-#carousel {
-    overflow: hidden;
-    width: 0px;
-    height: 0px;
+#carousel > img {
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
